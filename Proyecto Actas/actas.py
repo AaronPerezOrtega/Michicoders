@@ -22,27 +22,55 @@ class Actas:
         
     def getcasilla(self):
         return self.__casilla
+        
+    def setcasilla(self, casilla):
+        if int(casilla)<1:
+            raise ValueError("Casilla inexistente")
+        self.__casilla = casilla
     
     def gettc(self):
         return self.__tc
 
+    def settc(self,tc):
+        self.__tc = tc
+
     def getdistrito(self):
         return self.__distrito
 
+    def setdistrito(self,distrito):
+        self.__distrito = distrito
+        
     def getmunicipio(self):
         return self.__municipio
+
+    def setmunicipio(self, municipio):
+        self.__municipio = municipio
 
     def getseccion(self):
         return self.__seccion
 
+    def setseccion(self, seccion):
+        self.__seccion = seccion
+
     def gettv(self):
         return self.__tv
+
+    def settv(self,tv):
+        if int(tv)<0:
+            raise ValueError("Cantidad invalida")
+        self.__tv = tv
 
     def getqr(self):
         return self.__qr
 
+    def setqr(self, qr):
+        self.__qr = qr
+
     def getfp(self):
         return self.__fp
+
+    def setfp(self,fp):
+        self.__fp = fp
     
     def __str__(self):
         return self.__casilla
