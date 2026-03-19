@@ -344,7 +344,8 @@ if __name__ == "__main__":
         break
         
  
-#URGENTE       
+#URGENTE      
+#Checar el github
 #Checar errores con literales
 #Implementar que salgan los nombres de los estados
 #Crear la clase para los votos de cada partido
