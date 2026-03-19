@@ -4,7 +4,7 @@ from random import randint
 @dataclass
 
 class Actas:
-    def __init__(self,casilla,tc,distrito,municipio,estado,seccion,tv,qr,fp):
+    def __init__(self,casilla,tc,distrito,municipio,estado,seccion,VN,PAN,PRI,PRD,PVEM,PT,MC,MORENA,INDIE,PRIAN,PAI,PRN,PRID,PVTM,PTV,MV,PM,tv,qr,fp):
         if int(casilla) < 1:
             raise ValueError("Casilla inexistente")
         #El tipo de casillas son del 1 - 5 
@@ -31,6 +31,42 @@ class Actas:
             raise ValueError("Seccion invalida")
         seccion = str(seccion).zfill(5)
         
+        #Partidos politicos votos
+        if VN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PAN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PRI < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PRD < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PVEM < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PT < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if  MC < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if MORENA < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if INDIE < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PRIAN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PAI < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PRN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PRID < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PVTM < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PTV < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if MV < 0:
+            raise ValueError("Cantidad de votos invalida")
+        if PM < 0:
+            raise ValueError("Cantidad de votos invalida")
+        
         self.__casilla = casilla
         #tc = tipo de casilla
         self.__tc = tc
@@ -39,7 +75,25 @@ class Actas:
         self.__estado = estado
         self.__seccion = seccion
         #tv = total de votos
+        self.__VN = VN
+        self.__PAN = PAN
+        self.__PRI = PRI
+        self.__PRD = PRD
+        self.__PVEM = PVEM
+        self.__PT = PT
+        self.__MC = MC
+        self.__MORENA = MORENA
+        self.__INDIE = INDIE
+        self.__PRIAN = PRIAN
+        self.__PAI = PAI
+        self.__PRN = PRN
+        self.__PRID = PRID
+        self.__PVTM = PVTM
+        self.__PTV = PTV
+        self.__MV = MV
+        self.__PM = PM
         self.__tv = tv
+        #QR
         self.__qr = qr
         #fp = fecha de procesamiento 
         self.__fp = fp
@@ -56,7 +110,7 @@ class Actas:
         return self.__tc
 
     def settc(self,tc):
-        if  0 < int(tc) <= 5:
+        if not 0 < int(tc) <= 5:
             raise ValueError("Tipo de casilla inexistente")
         self.__tc = tc
 
@@ -64,7 +118,7 @@ class Actas:
         return self.__distrito
 
     def setdistrito(self,distrito):
-        if  0 < int(distrito) <= 300:
+        if not 0 < int(distrito) <= 300:
             raise ValueError("Distrito invalido")
         distrito = str(distrito).zfill(3)
         self.__distrito = distrito
@@ -95,6 +149,142 @@ class Actas:
             raise ValueError("Seccion invalida")
         seccion = str(seccion).zfill(5)
         self.__seccion = seccion
+    
+    def getVN(self):
+        return self.__VN
+
+    def setVN(self, VN):
+        if VN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__VN = VN
+
+    def getPAN(self):
+        return self.__PAN
+
+    def setPAN(self, PAN):
+        if PAN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PAN = PAN
+
+    def getPRI(self):
+        return self.__PRI
+
+    def setPRI(self, PRI):
+        if PRI < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PRI = PRI
+
+    def getPRD(self):
+        return self.__PRD
+
+    def setPRD(self, PRD):
+        if PRD < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PRD = PRD
+
+    def getPVEM(self):
+        return self.__PVEM
+
+    def setPVEM(self, PVEM):
+        if PVEM < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PVEM = PVEM
+
+    def getPT(self):
+        return self.__PT
+
+    def setPT(self, PT):
+        if PT < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PT = PT
+
+    def getMC(self):
+        return self.__MC
+
+    def setMC(self, MC):
+        if MC < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__MC = MC
+
+    def getMORENA(self):
+        return self.__MORENA
+
+    def setMORENA(self, MORENA):
+        if MORENA < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__MORENA = MORENA
+
+    def getINDIE(self):
+        return self.__INDIE
+
+    def setINDIE(self, INDIE):
+        if INDIE < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__INDIE = INDIE
+
+    def getPRIAN(self):
+        return self.__PRIAN
+
+    def setPRIAN(self, PRIAN):
+        if PRIAN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PRIAN = PRIAN
+
+    def getPAI(self):
+        return self.__PAI
+
+    def setPAI(self, PAI):
+        if PAI < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PAI = PAI
+
+    def getPRN(self):
+        return self.__PRN
+
+    def setPRN(self, PRN):
+        if PRN < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PRN = PRN
+
+    def getPRID(self):
+        return self.__PRID
+
+    def setPRID(self, PRID):
+        if PRID < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PRID = PRID
+
+    def getPVTM(self):
+        return self.__PVTM
+
+    def setPVTM(self, PVTM):
+        if PVTM < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PVTM = PVTM
+
+    def getPTV(self):
+        return self.__PTV
+
+    def setPTV(self, PTV):
+        if PTV < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PTV = PTV
+
+    def getMV(self):
+        return self.__MV
+
+    def setMV(self, MV):
+        if MV < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__MV = MV
+
+    def getPM(self):
+        return self.__PM
+
+    def setPM(self, PM):
+        if PM < 0:
+            raise ValueError("Cantidad de votos invalida")
+        self.__PM = PM
 
     def gettv(self):
         return self.__tv
@@ -117,8 +307,7 @@ class Actas:
         self.__fp = fp
 
     def __str__(self):
-        return f"-----------------------------------\nCasilla: {self.__casilla}\nTipo de casilla: {self.__tc}\nDistrito: {self.__distrito}\nMunicipio: {self.__municipio}\nEstado: {self.__estado}\nSeccion: {self.__seccion}\nTotal Votos: {self.__tv}\nQR: {self.__qr}\nFecha de Procesamiento: {self.__fp}\n-----------------------------------"
-
+            return f"""-----------------------------------\nCasilla: {self.__casilla}\nTipo de casilla: {self.__tc}\nDistrito: {self.__distrito}\nMunicipio: {self.__municipio}\nEstado: {self.__estado}\nSeccion: {self.__seccion}\n\nVotos:\nVN: {self.__VN}\nPAN: {self.__PAN}\nPRI: {self.__PRI}\nPRD: {self.__PRD}\nPVEM: {self.__PVEM}\nPT: {self.__PT}\nMC: {self.__MC}\nMORENA: {self.__MORENA}\nINDIE: {self.__INDIE}\nPRIAN: {self.__PRIAN}\nPAI: {self.__PAI}\nPRN: {self.__PRN}\nPRID: {self.__PRID}\nPVTM: {self.__PVTM}\nPTV: {self.__PTV}\nMV: {self.__MV}\nPM: {self.__PM}\nTotal Votos: {self.__tv}\n\nQR: {self.__qr}\nFecha de Procesamiento: {self.__fp}\n-----------------------------------"""
     def mostrar(lista):
         if not lista:
             print("Vacia")
@@ -127,14 +316,12 @@ class Actas:
             print(i)
         return
         
-#(self,casilla,tc,distrito,municipio,estado,seccion,tv,qr,fp):
+#casilla,tc,distrito,municipio,estado,seccion,VN,PAN,PRI,PRD,PVEM,PT,MC,MORENA,INDIE,PRIAN,PAI,PRN,PRID,PVTM,PTV,MV,PM,tv,qr,fp
 def main():
-    
-    Act1 = Actas("1","1","9","1","4","00001",243,"02,14,01,001,1",datetime.date.today())
-    Act2 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(1,132000000),"02,14,01,001,1",datetime.date.today())
-    Act3 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(1,132000000),"02,14,01,001,1",datetime.date.today())
-    Act4 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(1,132000000),"02,14,01,001,1",datetime.date.today())
-    
+    Act1 = Actas("1","1","9","1","4","00001",5,243,2,14,1,11,10,11,10,10,11,11,11,11,11,11,11,10000,"02,14,01,001,1",datetime.date.today())
+    Act2 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(0,50),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),"QR-ACTA-2",datetime.date.today())
+    Act3 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(0,50),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),"QR-ACTA-3",datetime.date.today())
+    Act4 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(0,50),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),"QR-ACTA-4",datetime.date.today())
     #manera 1 de mostrar la lista
     print(Act1)
     print(Act2)
@@ -198,3 +385,20 @@ if __name__ == "__main__":
 # 31 Zacatecas
 # 32 CDMX
  
+# PAN - Partido Acción Nacional
+# PRI - Partido Revolucionario Institucional
+# PRD - Partido de la Revolución Democrática
+# PVEM - Partido Verde Ecologista de México
+# PT - Partido del Trabajo
+# MC - Movimiento Ciudadano
+# MORENA - Movimiento Regeneración Nacional
+# INDIE - INDEPENDIENTE
+# PRIAN - PAN PRI PRD
+# PAI - PAN PRI
+# PRN - PAN PRD
+# PRID - PRI PRD
+# PVTM - VERDE PT MORENA
+# PTV - VERDE PT
+# MV - MORENA VERDE
+# PM - PT MORENA 
+# VN - voto nulo
