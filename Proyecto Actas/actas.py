@@ -328,7 +328,8 @@ def main():
     print(Act3)
     print(Act4)
     print()
-    
+    #print()
+
     #manera 2 de mostrar la lista
     actas = [Act1,Act2,Act3,Act4]
     Actas.mostrar(actas)
