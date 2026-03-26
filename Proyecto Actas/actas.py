@@ -1,8 +1,3 @@
-from dataclasses import dataclass
-import datetime
-from random import randint
-@dataclass
-
 class Actas:
     def __init__(self,casilla,tc,distrito,municipio,estado,seccion,VN,PAN,PRI,PRD,PVEM,PT,MC,MORENA,INDIE,PRIAN,PAI,PRN,PRID,PVTM,PTV,MV,PM,tv,qr,fp):
         if int(casilla) < 1:
@@ -308,7 +303,7 @@ class Actas:
 
     def __str__(self):
             return f"""-----------------------------------\nCasilla: {self.__casilla}\nTipo de casilla: {self.__tc}\nDistrito: {self.__distrito}\nMunicipio: {self.__municipio}\nEstado: {self.__estado}\nSeccion: {self.__seccion}\n\nVotos:\nVN: {self.__VN}\nPAN: {self.__PAN}\nPRI: {self.__PRI}\nPRD: {self.__PRD}\nPVEM: {self.__PVEM}\nPT: {self.__PT}\nMC: {self.__MC}\nMORENA: {self.__MORENA}\nINDIE: {self.__INDIE}\nPRIAN: {self.__PRIAN}\nPAI: {self.__PAI}\nPRN: {self.__PRN}\nPRID: {self.__PRID}\nPVTM: {self.__PVTM}\nPTV: {self.__PTV}\nMV: {self.__MV}\nPM: {self.__PM}\nTotal Votos: {self.__tv}\n\nQR: {self.__qr}\nFecha de Procesamiento: {self.__fp}\n-----------------------------------"""
-    def mostrar(lista):
+    def mostrar(self,lista):
         if not lista:
             print("Vacia")
             return
@@ -317,31 +312,7 @@ class Actas:
         return
         
 #casilla,tc,distrito,municipio,estado,seccion,VN,PAN,PRI,PRD,PVEM,PT,MC,MORENA,INDIE,PRIAN,PAI,PRN,PRID,PVTM,PTV,MV,PM,tv,qr,fp
-def main():
-    Act1 = Actas("1","1","9","1","4","00001",5,243,2,14,1,11,10,11,10,10,11,11,11,11,11,11,11,10000,"02,14,01,001,1",datetime.date.today())
-    Act2 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(0,50),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),"QR-ACTA-2",datetime.date.today())
-    Act3 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(0,50),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),"QR-ACTA-3",datetime.date.today())
-    Act4 = Actas(randint(1,10000),randint(1,5),randint(1,300),randint(1,2478),randint(1,32),randint(1,10000),randint(0,50),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),randint(0,100),"QR-ACTA-4",datetime.date.today())
-    #manera 1 de mostrar la lista
-    print(Act1)
-    print(Act2)
-    print(Act3)
-    print(Act4)
-    print()
-    #print()
 
-    #manera 2 de mostrar la lista
-    actas = [Act1,Act2,Act3,Act4]
-    Actas.mostrar(actas)
-    print()
-
-if __name__ == "__main__":
-    while True:
-        try:
-            main()
-        except ValueError as error:
-            print(error)
-        break
         
  
 #URGENTE      
