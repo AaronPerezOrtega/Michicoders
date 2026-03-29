@@ -40,7 +40,6 @@ ORDEN_VOTOS = [
 ]
 
 # ========== MAPEO DE CAMPOS DEL MODELO A LOS PARTIDOS ==========
-# SOLO LOS PARTIDOS PRINCIPALES TIENEN VALORES REALES
 CAMPOS_PRINCIPALES = {
     "Votos Pan": "PAN",
     "Votos PRI": "PRI",
@@ -49,9 +48,25 @@ CAMPOS_PRINCIPALES = {
     "Votos PT": "PT",
     "Votos MC": "MC",
     "Votos Morena": "MORENA",
-    "VOTOS NULOS": "VOTOS NULOS",
-    "TOTAL": "TOTAL"
-}
+    "Alianzas": "ALIANZAS",
+    "PRIAN ALIANZA": "PRIAN ALIANZA",
+    "PRIAN": "PRIAN",
+    "PAI ALIANZA": "PAI ALIANZA",
+    "PRN ALIANZA": "PRN ALIANZA",
+    "PAI": "PAI",
+    "PRN": "PRN",
+    "PAN ALIANZA": "PAN ALIANZA",
+    "PRID ALIANZA": "PRID ALIANZA",
+    "PRID": "PRID",
+    "PRI ALIANZA": "PRI ALIANZA",
+    "PRD ALIANZA": "PRD ALIANZA",
+    "PVTM": "PVTM",
+    "PTV": "PTV",
+    "MV": "MV",
+    "PM": "PM",
+    "CANDIDATURAS NO REGISTRADAS": "CANDIDATURAS NO REGISTRADAS",
+    "VOTOS NULOS": "VOTOS NULOS"
+    }
 
 # ========== DICCIONARIO DE PALABRAS A NÚMEROS ==========
 PALABRAS_NUMEROS = {
@@ -145,9 +160,9 @@ class Actas:
         nombre_estado = estados_nombres.get(self.__estado, self.__estado)
 
         print("\n" + "=" * 70)
-        print("🏛️  ACTA ELECTORAL")
+        print("  ACTA ELECTORAL")
         print("=" * 70)
-        print(f"\n📍 UBICACIÓN:")
+        print(f"\n UBICACIÓN:")
         print(f"   Casilla: {self.__casilla}")
         print(f"   Tipo de casilla: {self.__tc}")
         print(f"   Distrito: {self.__distrito}")
@@ -155,7 +170,7 @@ class Actas:
         print(f"   Estado: {nombre_estado} ({self.__estado})")
         print(f"   Sección: {self.__seccion}")
 
-        print(f"\n🗳️  RESULTADOS DE LA VOTACIÓN:")
+        print(f"\n  RESULTADOS DE LA VOTACIÓN:")
         print("-" * 60)
         for partido in ORDEN_VOTOS:
             valor = self.__resultados.get(partido, 0)
@@ -163,12 +178,10 @@ class Actas:
         print("-" * 60)
         print(f"   {'TOTAL':35} {self.__tv:>8}")
 
-        print(f"\n🔗 QR: {self.__qr}")
-        print(f"📅 Fecha: {self.__fp}")
+        print(f"\n QR: {self.__qr}")
+        print(f" Fecha: {self.__fp}")
         print("=" * 70)
 
-
-# ========== FUNCIONES DE EXTRACCIÓN ==========
 
 def extraer_numero_de_valor(valor):
     """Extrae el número correcto de un valor que puede tener múltiples formatos."""
@@ -182,29 +195,50 @@ def extraer_numero_de_valor(valor):
 
     if not valor_str:
         return 0
-
-    # 1. Buscar números de 2-3 dígitos completos (como 038, 014, 234)
     numeros_completos = re.findall(r'\b\d{2,4}\b', valor_str)
     if numeros_completos:
         return int(numeros_completos[-1])
-
-    # 2. Buscar dígitos individuales y unirlos (ej: "2\n3\n4" -> 234)
     digitos = re.findall(r'\b\d\b', valor_str)
     if len(digitos) >= 2:
         return int(''.join(digitos))
 
-    # 3. Buscar cualquier número
     numeros = re.findall(r'\d+', valor_str)
     if numeros:
         return int(numeros[-1])
 
-    # 4. Convertir palabra a número
     valor_upper = valor_str.upper()
     for palabra, num in PALABRAS_NUMEROS.items():
         if palabra in valor_upper:
             return num
 
     return 0
+
+def detectar_qr_prebuilt(ruta_imagen):
+    try:
+        client = DocumentIntelligenceClient(
+            endpoint=ENDPOINT,
+            credential=AzureKeyCredential(API_KEY)
+        )
+
+        with open(ruta_imagen, "rb") as imagen:
+            poller = client.begin_analyze_document(
+                model_id="prebuilt-read",
+                body=imagen,
+                features=["barcodes"]
+            )
+
+        resultado = poller.result()
+
+        if resultado.pages:
+            for pagina in resultado.pages:
+                if pagina.barcodes:
+                    for codigo in pagina.barcodes:
+                        if codigo.kind == "QRCode":
+                            return codigo.value
+        return None
+    except Exception as e:
+        print(f" Error detectando QR: {e}")
+        return None
 
 
 def analizar_con_modelo_personalizado(ruta_imagen):
@@ -215,7 +249,9 @@ def analizar_con_modelo_personalizado(ruta_imagen):
             credential=AzureKeyCredential(API_KEY)
         )
 
-        print(f"📤 Analizando con modelo personalizado: {MODELO_ID}...")
+        print(f" Analizando con modelo personalizado: {MODELO_ID}...")
+
+        qr_content = detectar_qr_prebuilt(ruta_imagen)
 
         with open(ruta_imagen, "rb") as imagen:
             poller = client.begin_analyze_document(
@@ -226,61 +262,58 @@ def analizar_con_modelo_personalizado(ruta_imagen):
         resultado = poller.result()
 
         campos = {}
-        qr_content = None
 
         if resultado.documents:
             for doc in resultado.documents:
                 for campo_nombre, campo_valor in doc.fields.items():
-                    # Obtener el valor raw
+                    
                     valor_raw = None
-                    if hasattr(campo_valor, 'content'):
+
+                    if hasattr(campo_valor, 'content') and campo_valor.content:
                         valor_raw = campo_valor.content
-                    elif hasattr(campo_valor, 'value_string'):
+                    elif hasattr(campo_valor, 'value_string') and campo_valor.value_string:
                         valor_raw = campo_valor.value_string
-                    elif hasattr(campo_valor, 'value_number'):
+                    elif hasattr(campo_valor, 'value_number') and campo_valor.value_number is not None:
                         valor_raw = campo_valor.value_number
 
                     campos[campo_nombre] = valor_raw
 
+        if not qr_content:
+            qr_content = "NO_QR"
+
         return qr_content, campos, resultado
 
     except Exception as e:
-        print(f"❌ Error en modelo personalizado: {e}")
-        return None, None, None
-
+        print(f" Error en modelo personalizado: {e}")
+        return "NO_QR", {}, None
 
 def extraer_resultados_completos(campos):
     """Extrae los resultados SOLO de los campos principales, el resto en 0"""
-    # Inicializar todos los resultados en 0
     resultados = {partido: 0 for partido in ORDEN_VOTOS}
 
-    print("\n🔍 DATOS EXTRAÍDOS POR EL MODELO PERSONALIZADO:")
+    print("\n DATOS EXTRAÍDOS POR EL MODELO PERSONALIZADO:")
     print("-" * 50)
 
-    # Solo procesar los campos principales
     for campo_nombre, valor_raw in campos.items():
         if valor_raw is None:
             continue
 
         numero = extraer_numero_de_valor(valor_raw)
 
-        # Mostrar lo que se extrajo
         print(f"   {campo_nombre}: {repr(valor_raw)} -> {numero}")
 
-        # Solo asignar a los campos principales
         if campo_nombre in CAMPOS_PRINCIPALES:
             partido = CAMPOS_PRINCIPALES[campo_nombre]
             if partido in resultados:
                 resultados[partido] = numero
                 print(f"      → Asignado a: {partido}")
 
-    # Buscar TOTAL
     total = 0
     if "TOTAL" in campos:
         total = extraer_numero_de_valor(campos["TOTAL"])
         print(f"\n   TOTAL: {total}")
     else:
-        # Calcular total sumando solo los partidos principales
+
         total = (resultados.get("PAN", 0) + resultados.get("PRI", 0) +
                  resultados.get("PRD", 0) + resultados.get("PVEM", 0) +
                  resultados.get("PT", 0) + resultados.get("MC", 0) +
@@ -350,7 +383,6 @@ def extraer_datos_identificacion(campos):
         "fecha": "02/06/2024"
     }
 
-    # Buscar en campos que podrían contener identificación
     for campo, valor in campos.items():
         if valor:
             campo_lower = campo.lower()
@@ -389,47 +421,47 @@ def crear_acta_desde_resultados(datos_qr, resultados, total, qr_content):
         )
         return acta
     except Exception as e:
-        print(f"❌ Error al crear acta: {e}")
+        print(f" Error al crear acta: {e}")
         return None
 
 
-# ========== PROGRAMA PRINCIPAL ==========
+# PROGRAMA PRINCIPAL 
 
 def main():
     lis_acta = []
 
     while True:
         print("\n" + "=" * 70)
-        print("🏛️  SISTEMA DE ACTAS CON AZURE DOCUMENT INTELLIGENCE")
+        print("  SISTEMA DE ACTAS CON AZURE DOCUMENT INTELLIGENCE")
         print(f"   Modelo personalizado: {MODELO_ID}")
         print("=" * 70)
-        print("1. 📷 Procesar una imagen con modelo personalizado")
-        print("2. 📁 Procesar todas las imágenes de una carpeta")
-        print("3. ✍️  Agregar acta manualmente")
-        print("4. 📋 Mostrar todas las actas")
-        print("5. 🗑️  Eliminar acta")
-        print("6. 📊 Resumen total de votos")
-        print("7. 💾 Exportar actas a JSON")
-        print("8. 🚪 Salir")
+        print("1.  Procesar una imagen con modelo personalizado")
+        print("2.  Procesar todas las imágenes de una carpeta")
+        print("3.  Agregar acta manualmente")
+        print("4.  Mostrar todas las actas")
+        print("5.  Eliminar acta")
+        print("6.  Resumen total de votos")
+        print("7.  Exportar actas a JSON")
+        print("8.  Salir")
         print("-" * 70)
 
         try:
-            opcion = int(input("🔹 Opción (1-8): "))
+            opcion = int(input(" Opción (1-8): "))
 
             if opcion == 1:
-                ruta = input("📁 Ruta de la imagen: ").strip().strip('"')
+                ruta = input(" Ruta de la imagen: ").strip().strip('"')
 
                 if not os.path.exists(ruta):
-                    print(f"❌ Archivo no encontrado: {ruta}")
+                    print(f" Archivo no encontrado: {ruta}")
                     continue
 
                 qr_content, campos, resultado = analizar_con_modelo_personalizado(ruta)
 
                 if not campos:
-                    print("❌ No se pudo extraer información de la imagen")
+                    print(" No se pudo extraer información de la imagen")
                     continue
 
-                print("\n📋 DATOS DE IDENTIFICACIÓN:")
+                print("\n DATOS DE IDENTIFICACIÓN:")
                 datos_qr = extraer_datos_identificacion(campos)
                 print(f"   Casilla: {datos_qr['casilla']}")
                 print(f"   Tipo casilla: {datos_qr['tc']}")
@@ -441,9 +473,9 @@ def main():
                 resultados, total_votos = extraer_resultados_completos(campos)
 
                 print("\n" + "=" * 70)
-                print("🏛️  RESULTADOS FINALES")
+                print("  RESULTADOS FINALES")
                 print("=" * 70)
-                print(f"\n📍 DATOS DE IDENTIFICACIÓN:")
+                print(f"\n DATOS DE IDENTIFICACIÓN:")
                 print(f"   Casilla: {datos_qr['casilla']}")
                 print(f"   Tipo casilla: {datos_qr['tc']}")
                 print(f"   Distrito: {datos_qr['distrito']}")
@@ -451,7 +483,7 @@ def main():
                 print(f"   Estado: {datos_qr['estado']}")
                 print(f"   Sección: {datos_qr['seccion']}")
 
-                print(f"\n🗳️  RESULTADOS DE LA VOTACIÓN:")
+                print(f"\n  RESULTADOS DE LA VOTACIÓN:")
                 print("-" * 60)
                 for partido in ORDEN_VOTOS:
                     valor = resultados.get(partido, 0)
@@ -459,28 +491,28 @@ def main():
                 print("-" * 60)
                 print(f"   {'TOTAL':35} {total_votos:>8}")
 
-                guardar = input("\n💾 ¿Guardar esta acta? (s/n): ")
+                guardar = input("\n ¿Guardar esta acta? (s/n): ")
                 if guardar.lower() == 's':
                     acta = crear_acta_desde_resultados(datos_qr, resultados, total_votos, qr_content)
                     if acta:
                         lis_acta.append(acta)
-                        print("✅ Acta guardada exitosamente")
+                        print(" Acta guardada exitosamente")
 
             elif opcion == 2:
-                carpeta = input("📁 Ruta de la carpeta con imágenes: ").strip().strip('"')
+                carpeta = input(" Ruta de la carpeta con imágenes: ").strip().strip('"')
 
                 if not os.path.exists(carpeta):
-                    print(f"❌ Carpeta no encontrada: {carpeta}")
+                    print(f" Carpeta no encontrada: {carpeta}")
                     continue
 
                 extensiones = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff')
                 imagenes = [f for f in os.listdir(carpeta) if f.lower().endswith(extensiones)]
 
                 if not imagenes:
-                    print("⚠️ No se encontraron imágenes en la carpeta")
+                    print(" No se encontraron imágenes en la carpeta")
                     continue
 
-                print(f"\n📁 Se encontraron {len(imagenes)} imágenes")
+                print(f"\n Se encontraron {len(imagenes)} imágenes")
                 print("-" * 50)
 
                 for i, img in enumerate(imagenes, 1):
@@ -490,31 +522,31 @@ def main():
                     qr_content, campos, resultado = analizar_con_modelo_personalizado(ruta)
 
                     if not campos:
-                        print(f"   ⚠️ No se pudo extraer información")
+                        print(f"   No se pudo extraer información")
                         continue
 
                     datos_qr = extraer_datos_identificacion(campos)
                     resultados, total_votos = extraer_resultados_completos(campos)
 
-                    print(f"   📍 Sección: {datos_qr['seccion']}, Casilla: {datos_qr['casilla']}")
+                    print(f"    Sección: {datos_qr['seccion']}, Casilla: {datos_qr['casilla']}")
 
                     # Mostrar resumen
                     resumen = []
                     for p in ["PAN", "PRI", "PRD", "PVEM", "PT", "MC", "MORENA", "VOTOS NULOS"]:
                         resumen.append(f"{p}:{resultados.get(p, 0)}")
-                    print(f"   🗳️  {' | '.join(resumen)} | TOTAL:{total_votos}")
+                    print(f"    {' | '.join(resumen)} | TOTAL:{total_votos}")
 
                     acta = crear_acta_desde_resultados(datos_qr, resultados, total_votos, qr_content)
                     if acta:
                         lis_acta.append(acta)
-                        print(f"   ✅ Acta guardada")
+                        print(f"   Acta guardada")
                     else:
-                        print(f"   ⚠️ No se pudo crear el acta")
+                        print(f"   No se pudo crear el acta")
 
-                print(f"\n✅ Procesamiento completado. {len(lis_acta)} actas guardadas.")
+                print(f"\n Procesamiento completado. {len(lis_acta)} actas guardadas.")
 
             elif opcion == 3:
-                print("\n✍️ AGREGAR ACTA MANUALMENTE")
+                print("\n AGREGAR ACTA MANUALMENTE")
                 casilla = input("Casilla: ")
                 tc = input("Tipo casilla (1-5): ")
                 distrito = input("Distrito: ")
@@ -522,7 +554,7 @@ def main():
                 estado = input("Estado (1-32): ")
                 seccion = input("Sección: ")
 
-                print("\n📊 INGRESA LOS VOTOS:")
+                print("\n INGRESA LOS VOTOS:")
                 resultados = {}
                 for partido in ORDEN_VOTOS:
                     resultados[partido] = int(input(f"{partido}: "))
@@ -537,33 +569,33 @@ def main():
                 acta = crear_acta_desde_resultados(datos_qr, resultados, total, "MANUAL")
                 if acta:
                     lis_acta.append(acta)
-                    print("✅ Acta agregada")
+                    print(" Acta agregada")
 
             elif opcion == 4:
                 if not lis_acta:
-                    print("⚠️ No hay actas registradas")
+                    print(" No hay actas registradas")
                 else:
                     for i, acta in enumerate(lis_acta, 1):
-                        print(f"\n📄 ACTA #{i}")
+                        print(f"\n ACTA #{i}")
                         acta.mostrar_acta()
 
             elif opcion == 5:
                 if not lis_acta:
-                    print("⚠️ No hay actas")
+                    print(" No hay actas")
                 else:
-                    print("\n📋 ACTAS REGISTRADAS:")
+                    print("\n ACTAS REGISTRADAS:")
                     for i, acta in enumerate(lis_acta, 1):
                         print(f"   {i}. Casilla: {acta.getcasilla()} - Sección: {acta.getseccion()}")
                     idx = int(input("\n🔹 Número del acta a eliminar: ")) - 1
                     if 0 <= idx < len(lis_acta):
                         eliminada = lis_acta.pop(idx)
-                        print(f"✅ Acta de casilla {eliminada.getcasilla()} eliminada")
+                        print(f" Acta de casilla {eliminada.getcasilla()} eliminada")
                     else:
-                        print("❌ Número inválido")
+                        print(" Número inválido")
 
             elif opcion == 6:
                 if not lis_acta:
-                    print("⚠️ No hay actas")
+                    print(" No hay actas")
                 else:
                     totales = {partido: 0 for partido in ORDEN_VOTOS}
                     for acta in lis_acta:
@@ -573,10 +605,10 @@ def main():
 
                     total_gral = sum(totales.values())
                     print("\n" + "=" * 60)
-                    print("📊 RESUMEN TOTAL DE VOTOS")
+                    print(" RESUMEN TOTAL DE VOTOS")
                     print("=" * 60)
-                    print(f"📋 Total de actas: {len(lis_acta)}")
-                    print(f"🗳️  Total de votos: {total_gral:,}\n")
+                    print(f" Total de actas: {len(lis_acta)}")
+                    print(f"  Total de votos: {total_gral:,}\n")
                     for partido, votos in totales.items():
                         if votos > 0:
                             print(f"   {partido}: {votos:,}")
@@ -584,9 +616,9 @@ def main():
 
             elif opcion == 7:
                 if not lis_acta:
-                    print("⚠️ No hay actas")
+                    print(" No hay actas")
                 else:
-                    nombre = input("📁 Nombre archivo (default: actas.json): ").strip()
+                    nombre = input(" Nombre archivo (default: actas.json): ").strip()
                     if not nombre:
                         nombre = "actas.json"
                     if not nombre.endswith('.json'):
@@ -608,21 +640,21 @@ def main():
                         })
                     with open(nombre, "w", encoding="utf-8") as f:
                         json.dump(exportar, f, ensure_ascii=False, indent=2)
-                    print(f"✅ Exportado a {nombre}")
+                    print(f" Exportado a {nombre}")
 
             elif opcion == 8:
-                print("\n👋 ¡Hasta luego!")
+                print("\n ¡Hasta luego!")
                 break
 
         except ValueError as e:
-            print(f"❌ Error: {e}")
+            print(f" Error: {e}")
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f" Error: {e}")
 
 
 if __name__ == "__main__":
     print("\n" + "=" * 70)
-    print("🏛️  SISTEMA DE ACTAS CON AZURE DOCUMENT INTELLIGENCE")
+    print("  SISTEMA DE ACTAS CON AZURE DOCUMENT INTELLIGENCE")
     print(f"   Modelo personalizado: {MODELO_ID}")
     print("=" * 70)
     main()

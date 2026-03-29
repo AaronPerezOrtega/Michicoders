@@ -310,19 +310,6 @@ class Actas:
         for i in lista:
             print(i)
         return
-        
-#casilla,tc,distrito,municipio,estado,seccion,VN,PAN,PRI,PRD,PVEM,PT,MC,MORENA,INDIE,PRIAN,PAI,PRN,PRID,PVTM,PTV,MV,PM,tv,qr,fp
-
-        
- 
-#URGENTE      
-#Checar el github
-#Checar errores con literales
-#Implementar que salgan los nombres de los estados
-#Crear la clase para los votos de cada partido
-#Crear Main
-#Preguntar acerca de la fecha de Procesamiento a la maestra
-#Preguntar si es solo con un distrito o varios a la maestra
 
 #Estados:
 # 01 Aguascalientes
