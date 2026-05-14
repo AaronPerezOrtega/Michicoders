@@ -1,0 +1,92 @@
+from modelo.alumno import Alumno
+class Asistencia_Controller:
+
+    def __init__(self,vista):
+        self.vista = vista
+        self.lista_alumnos = []
+
+    def resgistrar_asistencia(self, e):
+
+        try:
+        #Obtener Valores
+            nombre = self.vista.txt_nombre.value
+            grupo = self.vista.txt_grupo.value
+            materia = self.vista.txt_materia.value
+            presente = self.vista.chk_presente.value
+            
+            if nombre =="" and grupo =="" and materia =="":
+                self.vista.lbl_mensaje.value = "Debe de llenar todos los campos"
+                self.vista.lbl_mensaje.color = "red"
+                
+                self.vista.page.update()
+                return
+
+            if nombre == "":
+                self.vista.lbl_mensaje.value = "Debe escribir un nombre"
+                self.vista.lbl_mensaje.color = "red"
+
+                self.vista.page.update()
+                return
+            
+            if grupo == "":
+                self.vista.lbl_mensaje.value = "Debe escribir un grupo"
+                self.vista.lbl_mensaje.color = "red"
+
+                self.vista.page.update()
+                return
+            
+            if materia == "":
+                self.vista.lbl_mensaje.value = "Debe escribir un una materia"
+                self.vista.lbl_mensaje.color = "red"
+
+                self.vista.page.update()
+                return
+
+            if len(nombre) > 11:
+                raise Exception("El nombre del alumno no debe exceder 10 caracteres")
+            
+            #crear un objeto alumno
+            alumno = Alumno(nombre, grupo, materia, presente)
+            
+            self.lista_alumnos.append(alumno)
+
+            #Mostrar listado
+            self.vista.lista_registros.controls.append(
+                self.vista.agregar_texto(str(alumno))
+            )
+
+            self.vista.lbl_mensaje.value = "Asistencia Resgistrada Exitosamente"
+            self.vista.lbl_mensaje.color = "green"
+
+            #Limpiar campos
+
+            self.vista.txt_nombre.value = ""
+            self.vista.txt_grupo.value = ""
+            self.vista.txt_materia.value = ""
+            self.vista.chk_presente.value = False
+
+            self.vista.page.update()
+        
+        except Exception:
+            self.vista.lbl_mensaje.value = "Error en los datos"
+            self.vista.lbl_mensaje.color = "red" 
+
+            self.vista.page.update()
+
+    def eliminar_registros(self, e):
+        if len(self.lista_alumnos) == 0:
+            self.vista.lbl_mensaje.value = "No hay registros disponibles"
+            self.vista.lbl_mensaje.color = "red"
+
+            self.vista.page.update()
+            return
+        
+        self.lista_alumnos.clear()
+        
+        self.vista.lista_registros.controls.clear()
+        
+        self.vista.lbl_mensaje.value = "Se eliminaron todos los registros"
+        self.vista.lbl_mensaje.color = "yellow"
+        self.vista.page.update()
+        
+    
