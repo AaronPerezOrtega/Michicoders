@@ -1,0 +1,78 @@
+import flet as ft
+
+class AsistenciaView:
+    def __init__(self, page: ft.Page):
+        self.page = page
+        self.page.title = "Sistema de Asistencia"
+        self.page.window_width = 500
+        self.page.window_height = 600
+        self.page.padding = 20
+
+        self.txt_nombre = ft.TextField(
+            label = "Nombre del Alumno",
+            width = 400
+        )
+
+        self.txt_grupo = ft.TextField(
+            label = "Grupo del Alumno",
+            width = 400
+        )
+        
+        self.txt_materia = ft.TextField(
+            label = "Materia",
+            width = 400
+        )
+
+        self.chk_presente = ft.Checkbox(
+            label = "Presente"
+        )
+
+        self.btn_registrar = ft.ElevatedButton(
+            "Registrar Asistencia",
+            width=250)
+
+        self.btn_eliminar = ft.ElevatedButton(
+            "Eliminar Registros",
+            width=250)
+        
+
+        self.lbl_mensaje = ft.Text(
+            value = "",
+            size = 16
+        )
+
+        self.lista_registros = ft.Column()
+    
+    def construir_interfaz(self):
+        return ft.Column(
+            controls = [
+                ft.Text(
+                    "Registro de Asistencia",
+                    size = 30,
+                    weight = "bold"
+                ),
+
+                ft.Divider(),
+                
+                self.txt_nombre,
+                self.txt_grupo,
+                self.txt_materia,
+                self.chk_presente,
+                self.btn_registrar,
+                self.btn_eliminar,
+                self.lbl_mensaje,
+
+                ft.Text(
+                    "Lista de Registros",
+                    size = 20,
+                    weight = "bold"
+                ),
+
+                self.lista_registros
+            ]
+
+        )
+    
+    def agregar_texto(self, texto):
+        return ft.Text(value = texto, size = 16)
+
